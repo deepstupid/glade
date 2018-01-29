@@ -22,14 +22,14 @@ import glade.main.ProgramDataUtils.ShellProgramData;
 import glade.util.OracleUtils.IdentityWrapper;
 
 public class PythonData {
-	public static final String PYTHON_EXE = "python/Python-2.7.10/python";
-	public static final boolean PYTHON_IS_ERROR = true;
-	
-	public static final String PYTHON_EXTENSION = ".py";
-	public static final String PYTHON_EMPTY = "";
-	
-	public static final String PYTHON_NAME = "python";
-	public static final ProgramData PYTHON_DATA = new ShellProgramData(Files.FILE_PARAMETERS, PYTHON_EXE, PYTHON_IS_ERROR);
-	
-	public static final ProgramExamples PYTHON_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, PYTHON_NAME, PYTHON_EXTENSION, PYTHON_EMPTY, new IdentityWrapper());
+    public static final String PYTHON_EXE = "/usr/bin/python";
+    public static final boolean PYTHON_IS_ERROR = true;
+
+    public static final String PYTHON_EXTENSION = ".py";
+    public static final String PYTHON_EMPTY = "";
+
+    public static final String PYTHON_NAME = "python";
+    public static final ProgramData PYTHON_DATA = new ShellProgramData(Files.FILE_PARAMETERS, PYTHON_EXE, PYTHON_IS_ERROR);
+
+    public static final ProgramExamples PYTHON_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, PYTHON_NAME, PYTHON_EXTENSION, PYTHON_EMPTY, new IdentityWrapper());
 }

@@ -4,4 +4,6 @@ data/prog
 data/grammars
 log.txt
 *.class
-classes
+classes.idea/
+*.iml
+.idea

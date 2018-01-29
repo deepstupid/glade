@@ -31,86 +31,86 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GrammarDataUtils {
-	public static void clearGrammarDirectory(String grammarPath, String name) {
-		File dir = new File(grammarPath + File.separator + name);
-		if(dir.exists()) {
-			for(File file : dir.listFiles()) {
-				file.delete();
-			}
-		}
-	}
-	
-	private static String getGrammarFilename(String grammarPath, String name, int index) {
-		return grammarPath + File.separator + name + File.separator + "example" + index + ".gram";
-	}
-	
-	private static String getAllGrammarFilename(String grammarPath, String name) {
-		return grammarPath + File.separator + name + File.separator + "all.gram";
-	}
-	
-	public static void saveGrammar(String filename, Grammar grammar) {
-		try {
-			File file = new File(filename);
-			File parent = file.getParentFile();
-			if(parent != null) {
-				parent.mkdirs();
-			}
-			DataOutputStream dos = new DataOutputStream(new FileOutputStream(filename));
-			GrammarSerializer.serialize(grammar, dos);
-		} catch(IOException e) {
-			throw new RuntimeException("Error opening file during grammar save: " + filename, e);
-		} catch(RuntimeException e) {
-			throw new RuntimeException(e.getMessage() + "\nError serializing grammar: " + filename, e);
-		}
-	}
-	
-	public static Grammar loadGrammar(String filename) {
-		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(filename));
-			return GrammarSerializer.deserializeNodeWithMerges(dis);
-		} catch(IOException e) {
-			throw new RuntimeException("Error opening grammar file during grammar load: " + filename, e);
-		} catch(RuntimeException e) {
-			throw new RuntimeException(e.getMessage() + "\nError deserializing grammar: " + filename, e);
-		}
-	}
-	
-	public static void saveGrammar(String grammarPath, String name, int index, Grammar grammar) {
-		saveGrammar(getGrammarFilename(grammarPath, name, index), grammar);
-	}
-	
-	public static void saveAllGrammar(String grammarPath, String name, Grammar grammar) {
-		saveGrammar(getAllGrammarFilename(grammarPath, name), grammar);
-	}
-	
-	public static Grammar loadGrammar(String grammarPath, String name, int index) {
-		return loadGrammar(getGrammarFilename(grammarPath, name, index));
-	}
-	
-	public static Grammar loadAllGrammar(String grammarPath, String name) {
-		return loadGrammar(getAllGrammarFilename(grammarPath, name));
-	}
+    public static void clearGrammarDirectory(String grammarPath, String name) {
+        File dir = new File(grammarPath + File.separator + name);
+        if (dir.exists()) {
+            for (File file : dir.listFiles()) {
+                file.delete();
+            }
+        }
+    }
 
-	public static void learnGrammar(String grammarPath, String name, ProgramData data, ProgramExamples examples, int index) {
-		String example = examples.getTrainExamples().get(index);
-		Grammar grammar = GrammarSynthesis.getGrammarSingle(example, ProgramDataUtils.getQueryOracle(data));
-		saveGrammar(grammarPath, name, index, grammar);
-	}
-	
-	public static void mergeGrammar(String grammarPath, String name, ProgramData data, ProgramExamples examples) {
-		List<Node> roots = new ArrayList<Node>();
-		for(int i=0; i<examples.getTrainExamples().size(); i++) {
-			roots.add(GrammarDataUtils.loadGrammar(grammarPath, name, i).node);
-		}
-		Grammar grammar = GrammarSynthesis.getGrammarMultipleFromRoots(roots, ProgramDataUtils.getQueryOracle(data));
-		saveAllGrammar(grammarPath, name, grammar);
-	}
-	
-	public static void learnAllGrammar(String grammarPath, String name, ProgramData data, ProgramExamples examples) {
-		clearGrammarDirectory(grammarPath, name);
-		for(int i=0; i<examples.getTrainExamples().size(); i++) {
-			learnGrammar(grammarPath, name, data, examples, i);
-		}
-		mergeGrammar(grammarPath, name, data, examples);
-	}
+    private static String getGrammarFilename(String grammarPath, String name, int index) {
+        return grammarPath + File.separator + name + File.separator + "example" + index + ".gram";
+    }
+
+    private static String getAllGrammarFilename(String grammarPath, String name) {
+        return grammarPath + File.separator + name + File.separator + "all.gram";
+    }
+
+    public static void saveGrammar(String filename, Grammar grammar) {
+        try {
+            File file = new File(filename);
+            File parent = file.getParentFile();
+            if (parent != null) {
+                parent.mkdirs();
+            }
+            DataOutputStream dos = new DataOutputStream(new FileOutputStream(filename));
+            GrammarSerializer.serialize(grammar, dos);
+        } catch (IOException e) {
+            throw new RuntimeException("Error opening file during grammar save: " + filename, e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage() + "\nError serializing grammar: " + filename, e);
+        }
+    }
+
+    public static Grammar loadGrammar(String filename) {
+        try {
+            DataInputStream dis = new DataInputStream(new FileInputStream(filename));
+            return GrammarSerializer.deserializeNodeWithMerges(dis);
+        } catch (IOException e) {
+            throw new RuntimeException("Error opening grammar file during grammar load: " + filename, e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage() + "\nError deserializing grammar: " + filename, e);
+        }
+    }
+
+    public static void saveGrammar(String grammarPath, String name, int index, Grammar grammar) {
+        saveGrammar(getGrammarFilename(grammarPath, name, index), grammar);
+    }
+
+    public static void saveAllGrammar(String grammarPath, String name, Grammar grammar) {
+        saveGrammar(getAllGrammarFilename(grammarPath, name), grammar);
+    }
+
+    public static Grammar loadGrammar(String grammarPath, String name, int index) {
+        return loadGrammar(getGrammarFilename(grammarPath, name, index));
+    }
+
+    public static Grammar loadAllGrammar(String grammarPath, String name) {
+        return loadGrammar(getAllGrammarFilename(grammarPath, name));
+    }
+
+    public static void learnGrammar(String grammarPath, String name, ProgramData data, ProgramExamples examples, int index) {
+        String example = examples.getTrainExamples().get(index);
+        Grammar grammar = GrammarSynthesis.getGrammarSingle(example, ProgramDataUtils.getQueryOracle(data));
+        saveGrammar(grammarPath, name, index, grammar);
+    }
+
+    public static void mergeGrammar(String grammarPath, String name, ProgramData data, ProgramExamples examples) {
+        List<Node> roots = new ArrayList<>();
+        for (int i = 0; i < examples.getTrainExamples().size(); i++) {
+            roots.add(GrammarDataUtils.loadGrammar(grammarPath, name, i).node);
+        }
+        Grammar grammar = GrammarSynthesis.getGrammarMultipleFromRoots(roots, ProgramDataUtils.getQueryOracle(data));
+        saveAllGrammar(grammarPath, name, grammar);
+    }
+
+    public static void learnAllGrammar(String grammarPath, String name, ProgramData data, ProgramExamples examples) {
+        clearGrammarDirectory(grammarPath, name);
+        for (int i = 0; i < examples.getTrainExamples().size(); i++) {
+            learnGrammar(grammarPath, name, data, examples, i);
+        }
+        mergeGrammar(grammarPath, name, data, examples);
+    }
 }

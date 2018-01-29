@@ -17,14 +17,14 @@ package glade.constants;
 import glade.main.ProgramDataUtils.FileParameters;
 
 public class Files {
-	public static final String QUERY_PROG = "prog-query";
-	
-	public static final String FILENAME = "seed";
-	public static final String AUX_FILENAME = "aux_seed";
-	public static final long TIMEOUT = 400;
-	
-	public static final String EXAMPLE_TRAIN_PATH = "data/inputs-train";
-	public static final String GRAMMAR_PATH = "data/grammars";
-	
-	public static final FileParameters FILE_PARAMETERS = new FileParameters(QUERY_PROG, FILENAME, AUX_FILENAME, TIMEOUT, EXAMPLE_TRAIN_PATH);
+    public static final String QUERY_PROG = "prog-query";
+
+    public static final String FILENAME = "seed";
+    public static final String AUX_FILENAME = "aux_seed";
+    public static final long TIMEOUT = 400;
+
+    public static final String EXAMPLE_TRAIN_PATH = "data/inputs-train";
+    public static final String GRAMMAR_PATH = "data/grammars";
+
+    public static final FileParameters FILE_PARAMETERS = new FileParameters(QUERY_PROG, FILENAME, AUX_FILENAME, TIMEOUT, EXAMPLE_TRAIN_PATH);
 }

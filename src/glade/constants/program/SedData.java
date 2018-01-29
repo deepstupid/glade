@@ -24,20 +24,20 @@ import glade.util.ShellUtils.CommandFactory;
 
 
 public class SedData {
-	public static final String SED_EXE = "sed/sed-4.2.2/sed/sed";
-	public static final boolean SED_IS_ERROR = true;
-	
-	public static final String SED_EXTENSION = ".sed";
-	public static final String SED_EMPTY = "";
-	
-	public static final String SED_NAME = "sed";
-	public static final ProgramData SED_DATA = new ShellProgramData(Files.FILE_PARAMETERS, new SedCommandFactory(), SED_EXE, SED_IS_ERROR);
-	public static final ProgramExamples SED_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, SED_NAME, SED_EXTENSION, SED_EMPTY, new IdentityWrapper());
-	
-	public static class SedCommandFactory implements CommandFactory {
-		@Override
-		public String getCommand(String filename, String auxFilename, String exePath) {
-			return exePath + " -f " + filename + " " + auxFilename;
-		}
-	}
+    public static final String SED_EXE = "sed/sed-4.2.2/sed/sed";
+    public static final boolean SED_IS_ERROR = true;
+
+    public static final String SED_EXTENSION = ".sed";
+    public static final String SED_EMPTY = "";
+
+    public static final String SED_NAME = "sed";
+    public static final ProgramData SED_DATA = new ShellProgramData(Files.FILE_PARAMETERS, new SedCommandFactory(), SED_EXE, SED_IS_ERROR);
+    public static final ProgramExamples SED_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, SED_NAME, SED_EXTENSION, SED_EMPTY, new IdentityWrapper());
+
+    public static class SedCommandFactory implements CommandFactory {
+        @Override
+        public String getCommand(String filename, String auxFilename, String exePath) {
+            return exePath + " -f " + filename + ' ' + auxFilename;
+        }
+    }
 }

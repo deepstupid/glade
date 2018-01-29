@@ -22,15 +22,15 @@ import glade.main.ProgramDataUtils.ShellProgramData;
 import glade.util.OracleUtils.IdentityWrapper;
 
 public class XmlData {
-	public static final String XML_EXE = "xml/libxml2-2.9.2/xmllint";
-	public static final boolean XML_IS_ERROR = true;
-	public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
-	public static final String XML_EXTENSION = ".xml";
-	public static final String XML_EMPTY = "<a/>";
-	
-	public static final String XML_NAME = "xml";
-	public static final ProgramData XML_DATA = new ShellProgramData(Files.FILE_PARAMETERS, XML_EXE, XML_IS_ERROR);
-	public static final ProgramExamples XML_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, XML_NAME, XML_EXTENSION, XML_EMPTY, new IdentityWrapper());
-	
-	public static final String XML_EXAMPLE = "seed.xml";
+    public static final String XML_EXE = "xml/libxml2-2.9.2/xmllint";
+    public static final boolean XML_IS_ERROR = true;
+    public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
+    public static final String XML_EXTENSION = ".xml";
+    public static final String XML_EMPTY = "<a/>";
+
+    public static final String XML_NAME = "xml";
+    public static final ProgramData XML_DATA = new ShellProgramData(Files.FILE_PARAMETERS, XML_EXE, XML_IS_ERROR);
+    public static final ProgramExamples XML_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, XML_NAME, XML_EXTENSION, XML_EMPTY, new IdentityWrapper());
+
+    public static final String XML_EXAMPLE = "seed.xml";
 }

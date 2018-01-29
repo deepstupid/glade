@@ -27,151 +27,152 @@ import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.MultivalueMap;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 public class MergesSynthesis {
-	public static NodeMerges getMergesMultiple(List<Node> roots, DiscriminativeOracle oracle) {
-		NodeMerges merges = new NodeMerges();
-		NodeMerges processed = new NodeMerges();
-		for(Node first : roots) {
-			for(Node second : roots) {
-				if(processed.contains(first, second)) {
-					continue;
-				}
-				processed.add(first, second);
-				merges.addAll(getMergesSingle(first, second, oracle));
-			}
-		}
-		return merges;
-	}
-	
-	public static NodeMerges getMergesSingle(Node firstRoot, Node secondRoot, DiscriminativeOracle oracle) {
-		NodeMerges merges = new NodeMerges();
-		NodeMerges processedMerges = new NodeMerges();
-		MultivalueMap<Node,String> pairFirst = getAllExamples(firstRoot);
-		MultivalueMap<Node,String> pairSecond = getAllExamples(secondRoot);
-		for(Node first : GrammarUtils.getAllNodes(firstRoot)) {
-			for(Node second : GrammarUtils.getAllNodes(secondRoot)) {
-				if(processedMerges.contains(first, second)) {
-					continue;
-				}
-				processedMerges.add(first, second);
-				getMergesHelper(first, second, pairFirst, pairSecond, oracle, merges);
-			}
-		}
-		return merges;
-	}
-	
-	private static void getMergesHelper(Node first, Node second, MultivalueMap<Node,String> firstExampleMap, MultivalueMap<Node,String> secondExampleMap, DiscriminativeOracle oracle, NodeMerges merges) {
-		if(first.equals(second)) {
-			return;
-		}
-		if(!(first instanceof RepetitionNode) || !(second instanceof RepetitionNode)) {
-			return;
-		}
-		Node firstRep = ((RepetitionNode)first).rep;
-		Node secondRep = ((RepetitionNode)second).rep;
-		if(firstRep instanceof ConstantNode || firstRep instanceof MultiConstantNode || secondRep instanceof ConstantNode || secondRep instanceof MultiConstantNode) {
-			return;
-		}
-		if(isMultiAlternationRepetitionConstant(firstRep, true) || isMultiAlternationRepetitionConstant(secondRep, true)) {
-			return;
-		}
-		List<String> firstExamplesSimple = new ArrayList<String>();
-		List<String> secondExamplesSimple = new ArrayList<String>();
-		firstExamplesSimple.add(secondRep.getData().example + secondRep.getData().example);
-		secondExamplesSimple.add(firstRep.getData().example + firstRep.getData().example);
-		if(!GrammarSynthesis.getCheck(oracle, firstRep.getData().context, firstExamplesSimple) || !GrammarSynthesis.getCheck(oracle, secondRep.getData().context, secondExamplesSimple)) {
-			return;
-		}
-		List<String> firstExamples = new ArrayList<String>();
-		for(String example : secondExampleMap.get(secondRep)) {
-			firstExamples.add(example + example);
-		}
-		List<String> secondExamples = new ArrayList<String>();
-		for(String example : firstExampleMap.get(firstRep)) {
-			secondExamples.add(example + example);
-		}
-		if((isStructuredExample(firstRep) && isStructuredExample(secondRep))
-				|| (GrammarSynthesis.getCheck(oracle, firstRep.getData().context, firstExamples) && GrammarSynthesis.getCheck(oracle, secondRep.getData().context, secondExamples))) {
-			Log.info("MERGE NODE FIRST:\n" + firstRep.getData().context.pre + " ## " + firstRep.getData().example + " ## " + firstRep.getData().context.post);
-			Log.info("MERGE NODE SECOND:\n" + secondRep.getData().context.pre + " ## " + secondRep.getData().example + " ## " + secondRep.getData().context.post);
-			merges.add(firstRep, secondRep);
-		}
-	}
-	
-	private static void getAllExamplesHelper(Node node, MultivalueMap<Node,String> examples) {
-		for(Node child : node.getChildren()) {
-			getAllExamplesHelper(child, examples);
-		}
-		if(node instanceof RepetitionNode) {
-			RepetitionNode repNode = (RepetitionNode)node;
-			for(String example : examples.get(repNode.start)) {
-				examples.add(repNode, example + repNode.rep.getData().example + repNode.end.getData().example);
-			}
-			for(String example : examples.get(repNode.rep)) {
-				examples.add(repNode, repNode.start.getData().example + example + repNode.end.getData().example);
-			}
-			for(String example : examples.get(repNode.end)) {
-				examples.add(repNode, repNode.start.getData().example + repNode.rep.getData().example + example);
-			}
-		} else if(node instanceof MultiConstantNode) {
-			MultiConstantNode mconstNode = (MultiConstantNode)node;
-			String example = mconstNode.getData().example;
-			for(int i=0; i<mconstNode.characterChecks.size(); i++) {
-				String pre = example.substring(0, i);
-				String post = example.substring(i+1);
-				for(char c : mconstNode.characterChecks.get(i)) {
-					examples.add(mconstNode, pre + c + post);
-				}
-			}
-		} else if(node instanceof AlternationNode) {
-			AlternationNode altNode = (AlternationNode)node;
-			for(String example : examples.get(altNode.first)) {
-				examples.add(altNode, example);
-			}
-			for(String example : examples.get(altNode.second)) {
-				examples.add(altNode, example);
-			}
-		} else if(node instanceof ConstantNode) {
-			ConstantNode constNode = (ConstantNode)node;
-			examples.add(constNode, constNode.getData().example);
-		} else if(node instanceof MultiAlternationNode) {
-			MultiAlternationNode maltNode = (MultiAlternationNode)node;
-			for(Node child : maltNode.getChildren()) {
-				for(String example : examples.get(child)) {
-					examples.add(maltNode, example);
-				}
-			}
-		} else {
-			throw new RuntimeException("Invalid node type: " + node.getClass().getName());
-		}
-	}
-	
-	private static MultivalueMap<Node,String> getAllExamples(Node root) {
-		MultivalueMap<Node,String> allExamples = new MultivalueMap<Node,String>();
-		getAllExamplesHelper(root, allExamples);
-		return allExamples;
-	}
+    public static NodeMerges getMergesMultiple(Iterable<Node> roots, DiscriminativeOracle oracle) {
+        NodeMerges merges = new NodeMerges();
+        NodeMerges processed = new NodeMerges();
+        for (Node first : roots) {
+            for (Node second : roots) {
+                if (processed.contains(first, second)) {
+                    continue;
+                }
+                processed.add(first, second);
+                merges.addAll(getMergesSingle(first, second, oracle));
+            }
+        }
+        return merges;
+    }
 
-	
-	private static boolean isMultiAlternationRepetitionConstant(Node node, boolean isParentRep) {
-		return GrammarSynthesis.getMultiAlternationRepetitionConstantChildren(node, isParentRep).hasT();
-	}
-	
-	private static boolean isStructuredExample(Node node) {
-		for(Node descendant : GrammarUtils.getDescendants(node)) {
-			if(!(descendant instanceof MultiConstantNode)) {
-				continue;
-			}
-			MultiConstantNode mconstNode = (MultiConstantNode)descendant;
-			for(Set<Character> checks : mconstNode.characterChecks) {
-				if(checks.size() == 1) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+    public static NodeMerges getMergesSingle(Node firstRoot, Node secondRoot, DiscriminativeOracle oracle) {
+        NodeMerges merges = new NodeMerges();
+        NodeMerges processedMerges = new NodeMerges();
+        MultivalueMap<Node, String> pairFirst = getAllExamples(firstRoot);
+        MultivalueMap<Node, String> pairSecond = getAllExamples(secondRoot);
+        for (Node first : GrammarUtils.getAllNodes(firstRoot)) {
+            for (Node second : GrammarUtils.getAllNodes(secondRoot)) {
+                if (processedMerges.contains(first, second)) {
+                    continue;
+                }
+                processedMerges.add(first, second);
+                getMergesHelper(first, second, pairFirst, pairSecond, oracle, merges);
+            }
+        }
+        return merges;
+    }
+
+    private static void getMergesHelper(Node first, Node second, MultivalueMap<Node, String> firstExampleMap, MultivalueMap<Node, String> secondExampleMap, DiscriminativeOracle oracle, NodeMerges merges) {
+        if (first.equals(second)) {
+            return;
+        }
+        if (!(first instanceof RepetitionNode) || !(second instanceof RepetitionNode)) {
+            return;
+        }
+        Node firstRep = ((RepetitionNode) first).rep;
+        Node secondRep = ((RepetitionNode) second).rep;
+        if (firstRep instanceof ConstantNode || firstRep instanceof MultiConstantNode || secondRep instanceof ConstantNode || secondRep instanceof MultiConstantNode) {
+            return;
+        }
+        if (isMultiAlternationRepetitionConstant(firstRep, true) || isMultiAlternationRepetitionConstant(secondRep, true)) {
+            return;
+        }
+        Collection<String> firstExamplesSimple = new ArrayList<>();
+        Collection<String> secondExamplesSimple = new ArrayList<>();
+        firstExamplesSimple.add(secondRep.getData().example + secondRep.getData().example);
+        secondExamplesSimple.add(firstRep.getData().example + firstRep.getData().example);
+        if (!GrammarSynthesis.getCheck(oracle, firstRep.getData().context, firstExamplesSimple) || !GrammarSynthesis.getCheck(oracle, secondRep.getData().context, secondExamplesSimple)) {
+            return;
+        }
+        Collection<String> firstExamples = new ArrayList<>();
+        for (String example : secondExampleMap.get(secondRep)) {
+            firstExamples.add(example + example);
+        }
+        Collection<String> secondExamples = new ArrayList<>();
+        for (String example : firstExampleMap.get(firstRep)) {
+            secondExamples.add(example + example);
+        }
+        if ((isStructuredExample(firstRep) && isStructuredExample(secondRep))
+                || (GrammarSynthesis.getCheck(oracle, firstRep.getData().context, firstExamples) && GrammarSynthesis.getCheck(oracle, secondRep.getData().context, secondExamples))) {
+            Log.info("MERGE NODE FIRST:\n" + firstRep.getData().context.pre + " ## " + firstRep.getData().example + " ## " + firstRep.getData().context.post);
+            Log.info("MERGE NODE SECOND:\n" + secondRep.getData().context.pre + " ## " + secondRep.getData().example + " ## " + secondRep.getData().context.post);
+            merges.add(firstRep, secondRep);
+        }
+    }
+
+    private static void getAllExamplesHelper(Node node, MultivalueMap<Node, String> examples) {
+        for (Node child : node.getChildren()) {
+            getAllExamplesHelper(child, examples);
+        }
+        if (node instanceof RepetitionNode) {
+            RepetitionNode repNode = (RepetitionNode) node;
+            for (String example : examples.get(repNode.start)) {
+                examples.add(repNode, example + repNode.rep.getData().example + repNode.end.getData().example);
+            }
+            for (String example : examples.get(repNode.rep)) {
+                examples.add(repNode, repNode.start.getData().example + example + repNode.end.getData().example);
+            }
+            for (String example : examples.get(repNode.end)) {
+                examples.add(repNode, repNode.start.getData().example + repNode.rep.getData().example + example);
+            }
+        } else if (node instanceof MultiConstantNode) {
+            MultiConstantNode mconstNode = (MultiConstantNode) node;
+            String example = mconstNode.getData().example;
+            for (int i = 0; i < mconstNode.characterChecks.size(); i++) {
+                String pre = example.substring(0, i);
+                String post = example.substring(i + 1);
+                for (char c : mconstNode.characterChecks.get(i)) {
+                    examples.add(mconstNode, pre + c + post);
+                }
+            }
+        } else if (node instanceof AlternationNode) {
+            AlternationNode altNode = (AlternationNode) node;
+            for (String example : examples.get(altNode.first)) {
+                examples.add(altNode, example);
+            }
+            for (String example : examples.get(altNode.second)) {
+                examples.add(altNode, example);
+            }
+        } else if (node instanceof ConstantNode) {
+            Node constNode = node;
+            examples.add(constNode, constNode.getData().example);
+        } else if (node instanceof MultiAlternationNode) {
+            Node maltNode = node;
+            for (Node child : maltNode.getChildren()) {
+                for (String example : examples.get(child)) {
+                    examples.add(maltNode, example);
+                }
+            }
+        } else {
+            throw new RuntimeException("Invalid node type: " + node.getClass().getName());
+        }
+    }
+
+    private static MultivalueMap<Node, String> getAllExamples(Node root) {
+        MultivalueMap<Node, String> allExamples = new MultivalueMap<>();
+        getAllExamplesHelper(root, allExamples);
+        return allExamples;
+    }
+
+
+    private static boolean isMultiAlternationRepetitionConstant(Node node, boolean isParentRep) {
+        return GrammarSynthesis.getMultiAlternationRepetitionConstantChildren(node, isParentRep).hasT();
+    }
+
+    private static boolean isStructuredExample(Node node) {
+        for (Node descendant : GrammarUtils.getDescendants(node)) {
+            if (!(descendant instanceof MultiConstantNode)) {
+                continue;
+            }
+            MultiConstantNode mconstNode = (MultiConstantNode) descendant;
+            for (Set<Character> checks : mconstNode.characterChecks) {
+                if (checks.size() == 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

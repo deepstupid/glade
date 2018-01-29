@@ -23,21 +23,21 @@ import glade.util.OracleUtils.IdentityWrapper;
 import glade.util.ShellUtils.CommandFactory;
 
 public class GrepData {
-	public static final String GREP_EXE = "grep/grep-2.23/src/grep";
-	public static final boolean GREP_IS_ERROR = true;
-	
-	public static final String GREP_EXAMPLE_FILENAME = "tests.txt";
-	public static final String GREP_ALL_EXAMPLE_FILENAME = "tests_all.txt";
-	public static final String GREP_EMPTY = "";
-	
-	public static final String GREP_NAME = "grep";
-	public static final ProgramData GREP_DATA = new ShellProgramData(Files.FILE_PARAMETERS, new GrepCommandFactory(), GREP_EXE, GREP_IS_ERROR);
-	public static final ProgramExamples GREP_EXAMPLES = new SingleFileProgramExamples(Files.FILE_PARAMETERS, GREP_NAME, GREP_EXAMPLE_FILENAME, GREP_EMPTY, new IdentityWrapper());
-	
-	public static class GrepCommandFactory implements CommandFactory {
-		@Override
-		public String getCommand(String filename, String auxFilename, String exePath) {
-			return exePath + " -f " + filename + " " + auxFilename;
-		}
-	}
+    public static final String GREP_EXE = "/bin/grep";
+    public static final boolean GREP_IS_ERROR = true;
+
+    public static final String GREP_EXAMPLE_FILENAME = "tests.txt";
+    public static final String GREP_ALL_EXAMPLE_FILENAME = "tests_all.txt";
+    public static final String GREP_EMPTY = "";
+
+    public static final String GREP_NAME = "grep";
+    public static final ProgramData GREP_DATA = new ShellProgramData(Files.FILE_PARAMETERS, new GrepCommandFactory(), GREP_EXE, GREP_IS_ERROR);
+    public static final ProgramExamples GREP_EXAMPLES = new SingleFileProgramExamples(Files.FILE_PARAMETERS, GREP_NAME, GREP_EXAMPLE_FILENAME, GREP_EMPTY, new IdentityWrapper());
+
+    public static class GrepCommandFactory implements CommandFactory {
+        @Override
+        public String getCommand(String filename, String auxFilename, String exePath) {
+            return exePath + " -f " + filename + ' ' + auxFilename;
+        }
+    }
 }

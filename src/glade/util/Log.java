@@ -20,43 +20,43 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Log {
-	private static String logName = null;
-	private static boolean verboseValue = false;
-	
-	public static void init(String log, boolean verbose) {
-		logName = log;
-		verboseValue = verbose;
-		new File(logName).delete();
-	}
-	
-	public static void info(String s) {
-		if(logName == null) {
-			return;
-		}
-		if(verboseValue) {
-			System.out.println(s);
-		}
-		try {
-			PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
-			pw.println(s);
-			pw.close();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-	}
+    private static String logName = null;
+    private static boolean verboseValue = false;
 
-	public static void err(Exception e) {
-		if(verboseValue) {
-			e.printStackTrace();
-		} else {
-			System.err.println(e.getMessage());
-		}
-		try {
-			PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
-			e.printStackTrace(pw);
-			pw.close();
-		} catch(IOException ep) {
-			ep.printStackTrace();
-		}
-	}
+    public static void init(String log, boolean verbose) {
+        logName = log;
+        verboseValue = verbose;
+        new File(logName).delete();
+    }
+
+    public static void info(String s) {
+        if (logName == null) {
+            return;
+        }
+        if (verboseValue) {
+            System.out.println(s);
+        }
+        try {
+            PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
+            pw.println(s);
+            pw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void err(Exception e) {
+        if (verboseValue) {
+            e.printStackTrace();
+        } else {
+            System.err.println(e.getMessage());
+        }
+        try {
+            PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
+            e.printStackTrace(pw);
+            pw.close();
+        } catch (IOException ep) {
+            ep.printStackTrace();
+        }
+    }
 }

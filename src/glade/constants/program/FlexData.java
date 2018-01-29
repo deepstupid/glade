@@ -22,13 +22,13 @@ import glade.main.ProgramDataUtils.ShellProgramData;
 import glade.util.OracleUtils.IdentityWrapper;
 
 public class FlexData {
-	public static final String FLEX_EXE = "flex/flex-2.6.0/src/flex";
-	public static final boolean FLEX_IS_ERROR = true;
-	
-	public static final String FLEX_EXTENSION = ".lex";
-	public static final String FLEX_EMPTY = "%%\n%%";
-	
-	public static final String FLEX_NAME = "flex";
-	public static final ProgramData FLEX_DATA = new ShellProgramData(Files.FILE_PARAMETERS, FLEX_EXE, FLEX_IS_ERROR);
-	public static final ProgramExamples FLEX_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, FLEX_NAME, FLEX_EXTENSION, FLEX_EMPTY, new IdentityWrapper());
+    public static final String FLEX_EXE = "flex/flex-2.6.0/src/flex";
+    public static final boolean FLEX_IS_ERROR = true;
+
+    public static final String FLEX_EXTENSION = ".lex";
+    public static final String FLEX_EMPTY = "%%\n%%";
+
+    public static final String FLEX_NAME = "flex";
+    public static final ProgramData FLEX_DATA = new ShellProgramData(Files.FILE_PARAMETERS, FLEX_EXE, FLEX_IS_ERROR);
+    public static final ProgramExamples FLEX_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, FLEX_NAME, FLEX_EXTENSION, FLEX_EMPTY, new IdentityWrapper());
 }

@@ -23,33 +23,33 @@ import glade.util.OracleUtils.IdentityWrapper;
 import glade.util.OracleUtils.Wrapper;
 
 public class PythonWrappedData {
-	public static final String PYTHON_WRAPPED_NAME = "python_wrapped";
-	public static final String PYTHON_WRAPPED_EMPTY = "pass";
-	public static final ProgramData PYTHON_WRAPPED_DATA = new WrappedProgramData(PythonData.PYTHON_DATA, new PythonWrapper());
-	
-	public static final ProgramExamples PYTHON_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, PYTHON_WRAPPED_NAME, PythonData.PYTHON_EXTENSION, PYTHON_WRAPPED_EMPTY, new IdentityWrapper());
-	
-	public static class PythonWrapper implements Wrapper {
-		@Override
-		public String wrap(String input) {
-			StringBuilder sb = new StringBuilder();
-			
-			// header
-			sb.append("if False:\n");
-			
-			// query
-			boolean isEmpty = true;
-			for(String line : input.split("\n")) {
-				sb.append("    ").append(line).append("\n");
-				isEmpty = false;
-			}
-			
-			// pass if needed
-			if(isEmpty) {
-				sb.append("    pass");
-			}
-			
-			return sb.toString();
-		}
-	}
+    public static final String PYTHON_WRAPPED_NAME = "python_wrapped";
+    public static final String PYTHON_WRAPPED_EMPTY = "pass";
+    public static final ProgramData PYTHON_WRAPPED_DATA = new WrappedProgramData(PythonData.PYTHON_DATA, new PythonWrapper());
+
+    public static final ProgramExamples PYTHON_EXAMPLES = new MultiFileProgramExamples(Files.FILE_PARAMETERS, PYTHON_WRAPPED_NAME, PythonData.PYTHON_EXTENSION, PYTHON_WRAPPED_EMPTY, new IdentityWrapper());
+
+    public static class PythonWrapper implements Wrapper {
+        @Override
+        public String wrap(String input) {
+            StringBuilder sb = new StringBuilder();
+
+            // header
+            sb.append("if False:\n");
+
+            // query
+            boolean isEmpty = true;
+            for (String line : input.split("\n")) {
+                sb.append("    ").append(line).append('\n');
+                isEmpty = false;
+            }
+
+            // pass if needed
+            if (isEmpty) {
+                sb.append("    pass");
+            }
+
+            return sb.toString();
+        }
+    }
 }
