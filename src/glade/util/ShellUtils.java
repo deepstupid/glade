@@ -136,7 +136,7 @@ public class ShellUtils {
         }
 
         @Override
-        public String execute(String query) {
+        public String apply(String query) {
             write("", this.auxFilename);
             write(query, this.filename);
             String result = ShellUtils.executeForStream(this.command, this.isError, this.timeoutMillis);
@@ -155,8 +155,8 @@ public class ShellUtils {
         }
 
         @Override
-        public boolean query(String query) {
-            return SPACE.matcher(this.oracle.execute(query)).matches();
+        public boolean test(String query) {
+            return SPACE.matcher(this.oracle.apply(query)).matches();
         }
     }
 }

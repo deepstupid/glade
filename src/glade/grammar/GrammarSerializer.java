@@ -71,7 +71,7 @@ public class GrammarSerializer {
         String post = deserializeString(dis);
         String extraPre = deserializeString(dis);
         String extraPost = deserializeString(dis);
-        return new NodeData(example, new Context(new Context(), pre, post, extraPre, extraPost));
+        return new NodeData(example, new Context(Context.EMPTY, pre, post, extraPre, extraPost));
     }
 
     public static void serialize(Grammar grammar, DataOutputStream dos) throws IOException {
@@ -89,10 +89,9 @@ public class GrammarSerializer {
                 dos.writeInt(nodeIds.get(altNode.first)); // 3/2
                 dos.writeInt(nodeIds.get(altNode.second)); // 3/3
             } else if (node instanceof MultiAlternationNode) {
-                Node maltNode = node;
                 dos.writeInt(2); // 3/1
-                dos.writeInt(maltNode.getChildren().size()); // 3/2
-                for (Node child : maltNode.getChildren()) {
+                dos.writeInt(node.getChildren().size()); // 3/2
+                for (Node child : node.getChildren()) {
                     dos.writeInt(nodeIds.get(child)); // 3/3
                 }
             } else if (node instanceof RepetitionNode) {

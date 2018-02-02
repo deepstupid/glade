@@ -14,22 +14,25 @@
 
 package glade.util;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 public class OracleUtils {
-    public interface Oracle {
-        String execute(String query);
+
+    public interface Oracle extends Function<String,String> {
+
     }
 
-    public interface DiscriminativeOracle {
-        boolean query(String query);
+    public interface DiscriminativeOracle extends Predicate<String> {
     }
 
-    public interface Wrapper {
-        String wrap(String input);
+    public interface Wrapper extends Function<String,String> {
+
     }
 
     public static class IdentityWrapper implements Wrapper {
         @Override
-        public String wrap(String input) {
+        public String apply(String input) {
             return input;
         }
     }
@@ -44,23 +47,23 @@ public class OracleUtils {
         }
 
         @Override
-        public String execute(String query) {
-            return this.oracle.execute(this.wrapper.wrap(query));
+        public String apply(String query) {
+            return this.oracle.apply(this.wrapper.apply(query));
         }
     }
 
     public static class WrappedDiscriminativeOracle implements DiscriminativeOracle {
-        private final DiscriminativeOracle oracle;
+        private final Predicate<String> oracle;
         private final Wrapper wrapper;
 
-        public WrappedDiscriminativeOracle(DiscriminativeOracle oracle, Wrapper wrapper) {
+        public WrappedDiscriminativeOracle(Predicate<String> oracle, Wrapper wrapper) {
             this.oracle = oracle;
             this.wrapper = wrapper;
         }
 
         @Override
-        public boolean query(String query) {
-            return this.oracle.query(this.wrapper.wrap(query));
+        public boolean test(String query) {
+            return this.oracle.test(this.wrapper.apply(query));
         }
     }
 }

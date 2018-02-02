@@ -14,49 +14,46 @@
 
 package glade.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+@Deprecated public class Log {
+//    private static String logName = null;
+    private static boolean verbose = false;
 
-public class Log {
-    private static String logName = null;
-    private static boolean verboseValue = false;
-
-    public static void init(String log, boolean verbose) {
-        logName = log;
-        verboseValue = verbose;
-        new File(logName).delete();
+    public static void init(boolean verbose) {
+//        logName = log;
+        Log.verbose = verbose;
+//        new File(logName).delete();
     }
 
     public static void info(String s) {
-        if (logName == null) {
-            return;
-        }
-        if (verboseValue) {
+//        if (logName == null) {
+//            return;
+//        }
+        if (verbose) {
             System.out.println(s);
         }
-        try {
-            PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
-            pw.println(s);
-            pw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            PrintStream pw = System.out;
+//                    //new PrintWriter(new FileOutputStream(logName, true));
+//            pw.println(s);
+//            pw.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static void err(Exception e) {
-        if (verboseValue) {
+        if (verbose) {
             e.printStackTrace();
         } else {
             System.err.println(e.getMessage());
         }
-        try {
-            PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
-            e.printStackTrace(pw);
-            pw.close();
-        } catch (IOException ep) {
-            ep.printStackTrace();
-        }
+
+////        try {
+//            PrintWriter pw = new PrintWriter(new FileOutputStream(logName, true));
+//            e.printStackTrace(pw);
+//            pw.close();
+//        } catch (IOException ep) {
+//            ep.printStackTrace();
+//        }
     }
 }

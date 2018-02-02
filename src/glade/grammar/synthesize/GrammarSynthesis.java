@@ -24,20 +24,21 @@ import glade.grammar.GrammarUtils.NodeData;
 import glade.grammar.GrammarUtils.NodeMerges;
 import glade.grammar.GrammarUtils.RepetitionNode;
 import glade.util.Log;
-import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.Maybe;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class GrammarSynthesis {
-    private static Node getNode(String example, DiscriminativeOracle oracle) {
+    private static Node getNode(String example, Predicate<String> oracle) {
         return GrammarTransformer.getTransform(RegexSynthesis.getNode(example, oracle), oracle);
     }
 
-    public static Grammar getGrammarSingle(String example, DiscriminativeOracle oracle) {
+    public static Grammar getGrammarSingle(String example, Predicate<String> oracle) {
         long time = System.currentTimeMillis();
-        if (!oracle.query(example)) {
+        if (!oracle.test(example)) {
             throw new RuntimeException("Invalid example: " + example);
         }
         Log.info("PROCESSING EXAMPLE:\n" + example);
@@ -49,29 +50,34 @@ public class GrammarSynthesis {
         return grammar;
     }
 
-    public static Grammar getGrammarMultipleFromRoots(List<Node> roots, DiscriminativeOracle oracle) {
+    public static Grammar learn(List<Node> roots, Predicate<String> oracle) {
         long time = System.currentTimeMillis();
-        Grammar grammar = new Grammar(new MultiAlternationNode(new NodeData(null, new Context()), roots), MergesSynthesis.getMergesMultiple(roots, oracle));
+        Grammar grammar = new Grammar(new MultiAlternationNode(
+                new NodeData(null, Context.EMPTY), roots), MergesSynthesis.getMergesMultiple(roots, oracle));
         Log.info("MULTIPLE MERGE TIME: " + ((System.currentTimeMillis() - time) / 1000.0) + " seconds");
         return grammar;
     }
 
-    public static Grammar getGrammarMultiple(Iterable<String> examples, DiscriminativeOracle oracle) {
+    public static Grammar learn(Iterable<String> examples, Predicate<String> oracle) {
         List<Node> roots = new ArrayList<>();
         for (String example : examples) {
             roots.add(getNode(example, oracle));
         }
-        return getGrammarMultipleFromRoots(roots, oracle);
+        return learn(roots, oracle);
     }
 
-    public static Grammar getRegularGrammarMultipleFromRoots(List<Node> roots, DiscriminativeOracle oracle) {
+    public static Grammar getRegularGrammarMultipleFromRoots(List<Node> roots, Predicate<String> oracle) {
         long time = System.currentTimeMillis();
-        Grammar grammar = new Grammar(new MultiAlternationNode(new NodeData(null, new Context()), roots), new NodeMerges());
+        Grammar grammar = new Grammar(
+                new MultiAlternationNode(
+                        new NodeData(null, Context.EMPTY),
+                        roots),
+                new NodeMerges());
         Log.info("MULTIPLE MERGE TIME: " + ((System.currentTimeMillis() - time) / 1000.0) + " seconds");
         return grammar;
     }
 
-    public static Grammar getRegularGrammarMultiple(Iterable<String> examples, DiscriminativeOracle oracle) {
+    public static Grammar getRegularGrammarMultiple(Collection<String> examples, Predicate<String> oracle) {
         List<Node> roots = new ArrayList<>();
         for (String example : examples) {
             roots.add(getNode(example, oracle));
@@ -79,9 +85,9 @@ public class GrammarSynthesis {
         return getRegularGrammarMultipleFromRoots(roots, oracle);
     }
 
-    public static boolean getCheck(DiscriminativeOracle oracle, Context context, Iterable<String> examples) {
+    public static boolean getCheck(Predicate<String> oracle, Context context, Iterable<String> examples) {
         for (String example : examples) {
-            if (!oracle.query(context.pre + example + context.post) || (context.useExtra() && !oracle.query(context.extraPre + example + context.extraPost))) {
+            if (!oracle.test(context.pre + example + context.post) || (context.useExtra() && !oracle.test(context.extraPre + example + context.extraPost))) {
                 return false;
             }
         }

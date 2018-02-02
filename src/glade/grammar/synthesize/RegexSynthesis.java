@@ -21,15 +21,15 @@ import glade.grammar.GrammarUtils.Node;
 import glade.grammar.GrammarUtils.NodeData;
 import glade.grammar.GrammarUtils.RepetitionNode;
 import glade.util.Log;
-import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.Maybe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class RegexSynthesis {
-    public static Node getNode(String example, DiscriminativeOracle oracle) {
-        return getNode(new NodeData(example, new Context()), oracle, new NodeType[]{NodeType.REPETITION, NodeType.ALTERNATION}, true);
+    public static Node getNode(String example, Predicate<String> oracle) {
+        return getNode(new NodeData(example, Context.EMPTY), oracle, new NodeType[]{NodeType.REPETITION, NodeType.ALTERNATION}, true);
     }
 
     private static Iterable<String> getAlternationChecks(String first, String second) {
@@ -74,7 +74,7 @@ public class RegexSynthesis {
         }
     }
 
-    private static Maybe<AlternationPartialNode> getAlternationPartialNode(NodeData cur, DiscriminativeOracle oracle) {
+    private static Maybe<AlternationPartialNode> getAlternationPartialNode(NodeData cur, Predicate<String> oracle) {
         for (int i = 1; i <= cur.example.length() - 1; i++) {
             String first = cur.example.substring(0, i);
             String second = cur.example.substring(i);
@@ -88,7 +88,7 @@ public class RegexSynthesis {
         return new Maybe<>();
     }
 
-    private static Maybe<RepetitionPartialNode> getRepetitionPartialNode(NodeData cur, DiscriminativeOracle oracle, boolean isWholeStringRepeatable) {
+    private static Maybe<RepetitionPartialNode> getRepetitionPartialNode(NodeData cur, Predicate<String> oracle, boolean isWholeStringRepeatable) {
         for (int init = 0; init <= cur.example.length() - 1; init++) {
             for (int len = cur.example.length() - init; len >= 1; len--) {
                 if (len == cur.example.length() && !isWholeStringRepeatable) {
@@ -109,11 +109,11 @@ public class RegexSynthesis {
         return new Maybe<>();
     }
 
-    private static Maybe<Node> getConstantNode(NodeData cur, DiscriminativeOracle oracle) {
+    private static Maybe<Node> getConstantNode(NodeData cur, Predicate<String> oracle) {
         return new Maybe<>(new ConstantNode(cur));
     }
 
-    private static Maybe<Node> getAlternationNode(NodeData cur, DiscriminativeOracle oracle) {
+    private static Maybe<Node> getAlternationNode(NodeData cur, Predicate<String> oracle) {
         Maybe<AlternationPartialNode> maybe = getAlternationPartialNode(cur, oracle);
         if (!maybe.hasT()) {
             return new Maybe<>();
@@ -125,7 +125,7 @@ public class RegexSynthesis {
 
     final static NodeType[] emptyNodeTypes = {};
 
-    private static Maybe<Node> getRepetitionNode(NodeData cur, DiscriminativeOracle oracle, boolean isWholeStringRepeatable) {
+    private static Maybe<Node> getRepetitionNode(NodeData cur, Predicate<String> oracle, boolean isWholeStringRepeatable) {
         Maybe<RepetitionPartialNode> maybe = getRepetitionPartialNode(cur, oracle, isWholeStringRepeatable);
         if (!maybe.hasT()) {
             return new Maybe<>();
@@ -141,7 +141,7 @@ public class RegexSynthesis {
         REPETITION, ALTERNATION
     }
 
-    private static Node getNode(NodeData cur, DiscriminativeOracle oracle, NodeType[] types, boolean isWholeStringRepeatable) {
+    private static Node getNode(NodeData cur, Predicate<String> oracle, NodeType[] types, boolean isWholeStringRepeatable) {
         for (NodeType type : types) {
             switch (type) {
                 case REPETITION:

@@ -23,16 +23,15 @@ import glade.grammar.GrammarUtils.Node;
 import glade.grammar.GrammarUtils.NodeMerges;
 import glade.grammar.GrammarUtils.RepetitionNode;
 import glade.util.Log;
-import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.MultivalueMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class MergesSynthesis {
-    public static NodeMerges getMergesMultiple(Iterable<Node> roots, DiscriminativeOracle oracle) {
+    public static NodeMerges getMergesMultiple(Iterable<Node> roots, Predicate<String> oracle) {
         NodeMerges merges = new NodeMerges();
         NodeMerges processed = new NodeMerges();
         for (Node first : roots) {
@@ -47,7 +46,7 @@ public class MergesSynthesis {
         return merges;
     }
 
-    public static NodeMerges getMergesSingle(Node firstRoot, Node secondRoot, DiscriminativeOracle oracle) {
+    public static NodeMerges getMergesSingle(Node firstRoot, Node secondRoot, Predicate<String> oracle) {
         NodeMerges merges = new NodeMerges();
         NodeMerges processedMerges = new NodeMerges();
         MultivalueMap<Node, String> pairFirst = getAllExamples(firstRoot);
@@ -64,7 +63,7 @@ public class MergesSynthesis {
         return merges;
     }
 
-    private static void getMergesHelper(Node first, Node second, MultivalueMap<Node, String> firstExampleMap, MultivalueMap<Node, String> secondExampleMap, DiscriminativeOracle oracle, NodeMerges merges) {
+    private static void getMergesHelper(Node first, Node second, MultivalueMap<Node, String> firstExampleMap, MultivalueMap<Node, String> secondExampleMap, Predicate<String> oracle, NodeMerges merges) {
         if (first.equals(second)) {
             return;
         }
@@ -136,13 +135,11 @@ public class MergesSynthesis {
                 examples.add(altNode, example);
             }
         } else if (node instanceof ConstantNode) {
-            Node constNode = node;
-            examples.add(constNode, constNode.getData().example);
+            examples.add(node, node.getData().example);
         } else if (node instanceof MultiAlternationNode) {
-            Node maltNode = node;
-            for (Node child : maltNode.getChildren()) {
+            for (Node child : node.getChildren()) {
                 for (String example : examples.get(child)) {
-                    examples.add(maltNode, example);
+                    examples.add(node, example);
                 }
             }
         } else {

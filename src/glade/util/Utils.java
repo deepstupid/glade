@@ -18,8 +18,9 @@ import java.util.*;
 
 public class Utils {
     public static <V> Map<V, Integer> getInverse(List<V> list) {
-        Map<V, Integer> inverse = new HashMap<>();
-        for (int i = 0; i < list.size(); i++) {
+        int l = list.size();
+        Map<V, Integer> inverse = new HashMap<>(l);
+        for (int i = 0; i < l; i++) {
             inverse.put(list.get(i), i);
         }
         return inverse;
@@ -27,9 +28,9 @@ public class Utils {
 
     @SafeVarargs
     public static <T> List<T> getList(T... ts) {
-        List<T> tlist = new ArrayList<>(ts.length);
-        Collections.addAll(tlist, ts);
-        return tlist;
+//        List<T> tlist = new ArrayList<>(ts.length);
+//        Collections.addAll(tlist, ts);
+        return List.of(ts);
     }
 
     public static class MultivalueMap<K, V> extends HashMap<K, Set<V>> {
@@ -40,14 +41,13 @@ public class Utils {
         }
 
         public Collection<V> ensure(K k) {
-            Set<V> vSet = super.computeIfAbsent(k, k1 -> new HashSet<>());
-            return vSet;
+            return super.computeIfAbsent(k, k1 -> new HashSet<>());
         }
 
         @Override
         public Set<V> get(Object k) {
             Set<V> vSet = super.get(k);
-            return vSet == null ? new HashSet<>() : vSet;
+            return vSet == null ? Collections.EMPTY_SET : vSet;
         }
     }
 
@@ -73,8 +73,8 @@ public class Utils {
             return this.t != null;
         }
 
-        public T getTOr(T t) {
-            return this.hasT() ? this.getT() : t;
-        }
+//        public T getTOr(T t) {
+//            return this.hasT() ? this.getT() : t;
+//        }
     }
 }

@@ -14,7 +14,6 @@
 
 package glade.grammar.synthesize;
 
-import glade.grammar.GrammarUtils;
 import glade.grammar.GrammarUtils.AlternationNode;
 import glade.grammar.GrammarUtils.ConstantNode;
 import glade.grammar.GrammarUtils.Context;
@@ -25,14 +24,14 @@ import glade.grammar.GrammarUtils.RepetitionNode;
 import glade.util.CharacterUtils;
 import glade.util.Log;
 import glade.util.CharacterUtils.CharacterGeneralization;
-import glade.util.OracleUtils.DiscriminativeOracle;
 import glade.util.Utils.Maybe;
 import glade.util.Utils.MultivalueMap;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class GrammarTransformer {
-    public static Node getTransform(Node node, DiscriminativeOracle oracle) {
+    public static Node getTransform(Node node, Predicate<String> oracle) {
         Node transformFlatten = getTransform(node, new FlattenTransformer());
         return getTransform(transformFlatten, new ConstantTransformer(oracle, getMultiAlternationRepetitionConstantNodes(transformFlatten)));
     }
@@ -76,7 +75,7 @@ public class GrammarTransformer {
         }
     }
 
-    private static MultiConstantNode generalizeConstant(Node node, DiscriminativeOracle oracle) {
+    private static MultiConstantNode generalizeConstant(Node node, Predicate<String> oracle) {
         String example = node.getData().example;
         Context context = node.getData().context;
         if (example.length() != 0) {
@@ -120,10 +119,11 @@ public class GrammarTransformer {
     }
 
     private static boolean isContained(String example, MultiConstantNode mconstNode) {
-        if (example.length() != mconstNode.characterOptions.size()) {
+        int elen = example.length();
+        if (elen != mconstNode.characterOptions.size()) {
             return false;
         }
-        for (int i = 0; i < example.length(); i++) {
+        for (int i = 0; i < elen; i++) {
             if (!mconstNode.characterOptions.get(i).contains(example.charAt(i))) {
                 return false;
             }
@@ -140,7 +140,7 @@ public class GrammarTransformer {
         return false;
     }
 
-    private static Node generalizeMultiAlternationConstant(MultiAlternationNode node, MultivalueMap<MultiAlternationNode, ConstantNode> multiAlternationNodeConstantChildren, DiscriminativeOracle oracle) {
+    private static Node generalizeMultiAlternationConstant(MultiAlternationNode node, MultivalueMap<MultiAlternationNode, ConstantNode> multiAlternationNodeConstantChildren, Predicate<String> oracle) {
         List<MultiConstantNode> curConsts = new ArrayList<>();
         Log.info("GENERALIZING MULTI ALT: " + node.getData().example);
         for (Node child : multiAlternationNodeConstantChildren.get(node)) {
@@ -152,11 +152,11 @@ public class GrammarTransformer {
     }
 
     private static class ConstantTransformer implements NodeTransformer {
-        private final DiscriminativeOracle oracle;
+        private final Predicate<String> oracle;
         private final MultivalueMap<MultiAlternationNode, ConstantNode> multiAlternationNodeConstantChildren;
         private final Collection<ConstantNode> ignoredConstants = new HashSet<>();
 
-        private ConstantTransformer(DiscriminativeOracle oracle, MultivalueMap<MultiAlternationNode, ConstantNode> multiAlternationNodeConstantChildren) {
+        private ConstantTransformer(Predicate<String> oracle, MultivalueMap<MultiAlternationNode, ConstantNode> multiAlternationNodeConstantChildren) {
             this.oracle = oracle;
             this.multiAlternationNodeConstantChildren = multiAlternationNodeConstantChildren;
             for (Map.Entry<MultiAlternationNode, Set<ConstantNode>> multiAlternationNodeSetEntry : multiAlternationNodeConstantChildren.entrySet()) {

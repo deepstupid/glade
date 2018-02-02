@@ -106,9 +106,8 @@ public class GrammarFuzzer {
             int choice = SampleParameters.randMultiAlternation(random, recursiveNodes.get(grammar).size());
             return sampleHelper(new ArrayList<>(recursiveNodes.get(grammar)).get(choice), recursiveNodes, parameters, random, backup, length);
         } else if (grammar instanceof MultiAlternationNode) {
-            Node node = grammar;
-            int choice = SampleParameters.randMultiAlternation(random, node.getChildren().size());
-            return sampleHelper(node.getChildren().get(choice), recursiveNodes, parameters, random, backup, length);
+            int choice = SampleParameters.randMultiAlternation(random, grammar.getChildren().size());
+            return sampleHelper(grammar.getChildren().get(choice), recursiveNodes, parameters, random, backup, length);
         } else if (grammar instanceof RepetitionNode) {
             ParseTreeNode start = sampleHelper(((RepetitionNode) grammar).start, recursiveNodes, parameters, random, backup, length);
             List<ParseTreeNode> rep = new ArrayList<>();
@@ -250,8 +249,7 @@ public class GrammarFuzzer {
         public String next() {
             Node node = this.grammar.node;
             if (node instanceof MultiAlternationNode) {
-                Node maltNode = node;
-                List<Node> children = maltNode.getChildren();
+                List<Node> children = node.getChildren();
                 int choice = this.random.nextInt(children.size());
                 return this.sampleOne(children.get(choice));
             } else {
@@ -266,7 +264,7 @@ public class GrammarFuzzer {
 
         @Override
         public void remove() {
-            throw new RuntimeException("Remove not supported!");
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -302,7 +300,7 @@ public class GrammarFuzzer {
 
         @Override
         public void remove() {
-            throw new RuntimeException("Remove not supported!");
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -312,17 +310,19 @@ public class GrammarFuzzer {
 
     // performs a single edit to the string
     private static String nextStringMutant(String string, Random random) {
-        if (string.length() == 0) {
+        if (string.isEmpty()) {
             return String.valueOf(nextChar(random));
-        }
-        int randIndex = random.nextInt(string.length());
-        boolean randOp = random.nextBoolean(); // false -> delete, true -> insert
-        String head = string.substring(0, randIndex);
-        String tail = string.substring(randIndex);
-        if (randOp) {
-            return head + nextChar(random) + tail;
         } else {
-            return head + (tail.length() == 0 ? "" : tail.substring(1));
+            int randIndex = random.nextInt(string.length());
+            String head = string.substring(0, randIndex);
+            String tail = string.substring(randIndex);
+
+            // false -> delete, true -> insert
+            if (random.nextBoolean()) {
+                return head + nextChar(random) + tail;
+            } else {
+                return tail.isEmpty() ? head : (head + tail.substring(1));
+            }
         }
     }
 

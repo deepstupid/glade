@@ -35,7 +35,9 @@ public class GrammarUtils {
         public final String extraPre;
         public final String extraPost;
 
-        public Context() {
+        public final static Context EMPTY = new Context();
+
+        private Context() {
             this.pre = "";
             this.post = "";
             this.extraPre = "";
@@ -141,10 +143,11 @@ public class GrammarUtils {
         }
 
         public List<Node> getChildren() {
-            List<Node> children = new ArrayList<>();
-            children.add(this.first);
-            children.add(this.second);
-            return children;
+            return List.of(first, second);
+//            List<Node> children = new ArrayList<>();
+//            children.add(this.first);
+//            children.add(this.second);
+//            return children;
         }
 
         public NodeData getData() {
@@ -158,16 +161,17 @@ public class GrammarUtils {
 
     public static class MultiAlternationNode implements Node {
         private final NodeData data;
-        private final Collection<Node> children = new ArrayList<>();
+        private final List<Node> children;// = new ArrayList<>();
 
-        public MultiAlternationNode(NodeData data, Collection<Node> children) {
+        public MultiAlternationNode(NodeData data, List<Node> children) {
             this.data = data;
-            this.children.addAll(children);
+            //this.children.addAll(children);
+            this.children = children;
         }
 
         public List<Node> getChildren() {
-            List<Node> newChildren = new ArrayList<Node>(this.children);
-            return newChildren;
+            //return new ArrayList<>(this.children);
+            return children;
         }
 
         public NodeData getData() {
@@ -197,11 +201,12 @@ public class GrammarUtils {
         }
 
         public List<Node> getChildren() {
-            List<Node> children = new ArrayList<>();
-            children.add(this.start);
-            children.add(this.rep);
-            children.add(this.end);
-            return children;
+            return List.of(start, rep, end);
+//            List<Node> children = new ArrayList<>();
+//            children.add(this.start);
+//            children.add(this.rep);
+//            children.add(this.end);
+//            return children;
         }
 
         public NodeData getData() {
