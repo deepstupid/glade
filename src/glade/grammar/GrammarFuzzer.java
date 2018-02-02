@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package glade.grammar.fuzz;
+package glade.grammar;
 
-import glade.grammar.GrammarUtils;
 import glade.grammar.GrammarUtils.Grammar;
 import glade.grammar.GrammarUtils.MultiAlternationNode;
 import glade.grammar.GrammarUtils.MultiConstantNode;
 import glade.grammar.GrammarUtils.Node;
 import glade.grammar.GrammarUtils.NodeMerges;
 import glade.grammar.GrammarUtils.RepetitionNode;
-import glade.grammar.ParseTreeUtils;
 import glade.grammar.ParseTreeUtils.ParseTreeMultiConstantNode;
 import glade.grammar.ParseTreeUtils.ParseTreeNode;
 import glade.grammar.ParseTreeUtils.ParseTreeRepetitionNode;

@@ -1,7 +1,7 @@
 package main;
 
 import glade.grammar.GrammarUtils;
-import glade.grammar.fuzz.GrammarFuzzer;
+import glade.grammar.GrammarFuzzer;
 import glade.grammar.synthesize.GrammarSynthesis;
 import glade.util.Log;
 import org.junit.Test;

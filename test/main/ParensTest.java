@@ -14,8 +14,8 @@
 
 package main;
 
-import glade.grammar.fuzz.GrammarFuzzer.GrammarMutationSampler;
-import glade.grammar.fuzz.GrammarFuzzer.SampleParameters;
+import glade.grammar.GrammarFuzzer.GrammarMutationSampler;
+import glade.grammar.GrammarFuzzer.SampleParameters;
 import glade.grammar.GrammarUtils.Grammar;
 import glade.grammar.synthesize.GrammarSynthesis;
 import glade.util.Log;

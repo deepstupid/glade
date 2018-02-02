@@ -21,6 +21,7 @@ import glade.grammar.GrammarUtils.RepetitionNode;
 import glade.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ParseTreeUtils {
@@ -66,7 +67,7 @@ public class ParseTreeUtils {
 
         @Override
         public List<ParseTreeNode> getChildren() {
-            List<ParseTreeNode> children = new ArrayList<>();
+            List<ParseTreeNode> children = new ArrayList<>(2 + rep.size());
             children.add(this.start);
             children.addAll(this.rep);
             children.add(this.end);
@@ -133,7 +134,7 @@ public class ParseTreeUtils {
 
         @Override
         public List<ParseTreeNode> getChildren() {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         @Override
@@ -188,11 +189,13 @@ public class ParseTreeUtils {
             RepetitionNode repNode = (RepetitionNode) node;
             ParseTreeNode start = getParseTreeRepConst(repNode.start);
             ParseTreeNode end = getParseTreeRepConst(repNode.end);
-            if (repNode.rep instanceof MultiAlternationNode) {
-                return new ParseTreeRepetitionNode(repNode, start, getParseTreeAlt((MultiAlternationNode) repNode.rep), end);
-            } else {
-                return new ParseTreeRepetitionNode(repNode, start, Utils.getList(getParseTreeRepConst(repNode.rep)), end);
-            }
+            return new ParseTreeRepetitionNode(repNode, start,
+                    (repNode.rep instanceof MultiAlternationNode) ?
+                            getParseTreeAlt((MultiAlternationNode) repNode.rep)
+                                :
+                            Utils.getList(getParseTreeRepConst(repNode.rep)),
+                    end);
+
         } else if (node instanceof MultiConstantNode) {
             return new ParseTreeMultiConstantNode((MultiConstantNode) node, node.getData().example);
         } else {
@@ -243,16 +246,19 @@ public class ParseTreeUtils {
             return sub;
         } else if (node instanceof ParseTreeRepetitionNode) {
             ParseTreeRepetitionNode repNode = (ParseTreeRepetitionNode) node;
-            ParseTreeNode newStart = getSubstitute(repNode.start, cur, sub);
+
             List<ParseTreeNode> newRep = new ArrayList<>();
-            for (ParseTreeNode rep : repNode.rep) {
+            for (ParseTreeNode rep : repNode.rep)
                 newRep.add(getSubstitute(rep, cur, sub));
-            }
-            ParseTreeNode newEnd = getSubstitute(repNode.end, cur, sub);
-            return new ParseTreeRepetitionNode(repNode.node, newStart, newRep, newEnd);
+
+            return new ParseTreeRepetitionNode(repNode.node,
+                    getSubstitute(repNode.start, cur, sub),
+                    newRep,
+                    getSubstitute(repNode.end, cur, sub));
+
         } else if (node instanceof ParseTreeMultiAlternationNode) {
-            ParseTreeNode newChoice = getSubstitute(((ParseTreeMultiAlternationNode) node).choice, cur, sub);
-            return new ParseTreeMultiAlternationNode(((ParseTreeMultiAlternationNode) node).node, newChoice);
+            ParseTreeMultiAlternationNode pn = (ParseTreeMultiAlternationNode) node;
+            return new ParseTreeMultiAlternationNode(pn.node, getSubstitute(pn.choice, cur, sub));
         } else if (node instanceof ParseTreeMultiConstantNode) {
             return node;
         } else {
